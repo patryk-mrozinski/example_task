@@ -2,48 +2,48 @@ require_relative './separator'
 
 class Job
   def initialize(input)
-    @hash = Separator.new(input).parse
-    @final = []
+    @colection = Separator.new(input).parse
+    @final_sequence = []
   end
 
-  def solution
-    @hash.each do |key, value|
-
+  def queue
+    @colection.each do |key, value|
       if self_depending?(key, value)
         return 'ERROR! jobs can’t depend on themselves!'
       end
 
-      next if @final.include?(key)
+      next if @final_sequence.include?(key)
 
       if not_depending_on_any_jobs?(value)
-        @final << key
+        @final_sequence << key
         next
       end
 
       if dependent_job_already_done?(value)
-        @final << key
+        @final_sequence << key
         next
       end
 
-      arr = [key]
+      sequence = [key]
       loop do
-        new_key = @hash[key]
+        new_key = @colection[key]
 
-        if not_circulary_dependent?(arr, new_key)
+        if not_circulary_dependent?(sequence, new_key)
           return 'ERROR! jobs can’t have circular dependencies!'
         end
 
-        arr << new_key
+        sequence << new_key
 
-        if @hash[new_key].nil?
+        if @colection[new_key].nil?
           break
         else
           key = new_key
         end
       end
-      @final.push(*arr.reverse)
+      @final_sequence.push(*sequence.reverse)
     end
-    return @final.join(', ')
+
+    @final_sequence.join(', ')
   end
 
   private
@@ -57,10 +57,10 @@ class Job
   end
 
   def dependent_job_already_done?(value)
-    @final.include?(value)
+    @final_sequence.include?(value)
   end
 
-  def not_circulary_dependent?(arr, new_key)
-    arr.include?(new_key)
+  def not_circulary_dependent?(sequence, new_key)
+    sequence.include?(new_key)
   end
 end
